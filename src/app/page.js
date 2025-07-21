@@ -1,12 +1,12 @@
 'use client'; 
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image'; // IMPORT: Next.js Image component for optimization
 import { Roboto, Lato, Montserrat, Open_Sans } from 'next/font/google';
 import { FaHardHat, FaCheckCircle, FaTools, FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from 'react-icons/fa';
 
 // --- FONT & ICON MAPPING ---
 
-// CORRECTED: Declare each font loader at the top level of the module scope.
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '700'] });
 const lato = Lato({ subsets: ['latin'], weight: ['400', '700'] });
 const montserrat = Montserrat({ subsets: ['latin'], weight: ['400', '700'] });
@@ -43,9 +43,9 @@ const Header = ({ config, activePageKey, setActivePageKey }) => {
         <header className="sticky top-0 z-50 shadow-md" style={{ backgroundColor: styles.global.backgroundColor }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
-                    <a href="#home" onClick={(e) => { e.preventDefault(); window.location.hash = 'home'; setActivePageKey('home'); }} className="flex-shrink-0">
+                    <a href="#home" onClick={(e) => { e.preventDefault(); window.location.hash = 'home'; setActivePageKey('home'); }} className="flex-shrink-0 relative h-12 w-48">
                         {config.branding?.logoUrl ? 
-                            <img src={config.branding.logoUrl} alt={`${config.branding.companyName} Logo`} className="h-12 w-auto" onError={(e) => e.target.style.display='none'} /> :
+                            <Image src={config.branding.logoUrl} alt={`${config.branding.companyName} Logo`} fill style={{ objectFit: 'contain' }} onError={(e) => e.target.style.display='none'} /> :
                             <h1 className="text-2xl font-bold" style={{ fontFamily: styles.global.headingFont, color: styles.global.primaryColor }}>{config.branding.companyName}</h1>
                         }
                     </a>
@@ -120,7 +120,7 @@ const Footer = ({ config }) => {
 
 const HeroSection = ({ section, styles }) => (
     <section className="relative text-white rounded-lg overflow-hidden shadow-xl" style={{ minHeight: '60vh' }}>
-        <img src={section.imageUrl} alt={section.heading || 'Hero background'} className="absolute h-full w-full object-cover" onError={(e) => e.target.src='https://placehold.co/1920x1080/cccccc/ffffff?text=Image+Not+Found'}/>
+        <Image src={section.imageUrl || 'https://placehold.co/1920x1080/cccccc/ffffff?text=Image+Not+Found'} alt={section.heading || 'Hero background'} fill style={{objectFit: 'cover'}} priority />
         <div className="absolute h-full w-full bg-black opacity-50"></div>
         <div className="relative z-10 flex flex-col items-center justify-center text-center p-8" style={{ minHeight: '60vh' }}>
             <h1 className="text-4xl md:text-6xl font-bold" style={{ fontFamily: styles.global.headingFont }}>{section.heading}</h1>
@@ -165,7 +165,9 @@ const TeamSection = ({ section, styles }) => (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             {section.items?.map((item, index) => (
                 <div key={index} className="text-center">
-                    <img src={item.imageUrl} alt={item.name} className="w-40 h-40 rounded-full mx-auto object-cover shadow-lg mb-4" onError={(e) => e.target.src='https://placehold.co/400x400/EFEFEF/AAAAAA&text=Person'} />
+                    <div className="relative w-40 h-40 rounded-full mx-auto shadow-lg mb-4 overflow-hidden">
+                        <Image src={item.imageUrl || 'https://placehold.co/400x400/EFEFEF/AAAAAA&text=Person'} alt={item.name} fill style={{objectFit: 'cover'}} />
+                    </div>
                     <h3 className="text-xl font-bold" style={{ fontFamily: styles.global.headingFont, color: styles.global.textColor }}>{item.name}</h3>
                     <p className="mt-1" style={{ fontFamily: styles.global.bodyFont, color: styles.global.primaryColor }}>{item.role}</p>
                 </div>
@@ -193,8 +195,8 @@ const GallerySection = ({ section, styles }) => (
         <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: styles.global.headingFont, color: styles.global.textColor }}>{section.title}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {section.images?.map((image, index) => (
-                <div key={index} className="aspect-w-1 aspect-h-1">
-                    <img src={image.url} alt={image.alt} className="w-full h-full object-cover rounded-lg shadow-md hover:shadow-xl transition-shadow" onError={(e) => e.target.src='https://placehold.co/600x400/eee/ccc?text=Image'}/>
+                <div key={index} className="aspect-w-1 aspect-h-1 relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+                    <Image src={image.url || 'https://placehold.co/600x400/eee/ccc?text=Image'} alt={image.alt} fill style={{objectFit: 'cover'}}/>
                 </div>
             ))}
         </div>
@@ -296,8 +298,8 @@ export default function HomePage() {
                         const Component = sectionComponentMap[key];
                         if (!Component) return null;
                         
+                        // CORRECTED: Moved the key prop directly onto the component for the iterator.
                         const props = {
-                            key: key,
                             section: sectionData,
                             styles: styles,
                         };
@@ -306,7 +308,7 @@ export default function HomePage() {
                             props.footerData = config.footer;
                         }
 
-                        return <Component {...props} />;
+                        return <Component key={key} {...props} />;
                     }) : <div>Page content not found. Please select a page from the navigation.</div>}
                 </main>
             </div>
