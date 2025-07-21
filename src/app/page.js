@@ -1,142 +1,163 @@
 // src/app/page.js
 
-'use client'; // This is a Next.js directive to indicate a client-side component
+'use client'; 
 
 import React, { useState, useEffect } from 'react';
 
-// --- Reusable Section Components (Unchanged) ---
+// --- Helper Component to dynamically load Google Fonts ---
+const GoogleFontLoader = ({ fontNames }) => {
+    useEffect(() => {
+        if (!fontNames || fontNames.length === 0) return;
+        const link = document.createElement('link');
+        const fonts = fontNames.map(name => name.replace(/ /g, '+')).join('|');
+        link.href = `https://fonts.googleapis.com/css?family=${fonts}:400,700&display=swap`;
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+
+        return () => {
+            document.head.removeChild(link);
+        };
+    }, [fontNames]);
+    return null;
+};
+
+
+// --- Professional, Reusable Section Components ---
+
 const HeroSection = ({ section, styles }) => (
-    <section style={styles.hero} className="text-center py-20 bg-gray-100 rounded-lg">
-        <h1 className="text-5xl font-bold" style={{ color: styles.header.color }}>{section.title}</h1>
-        <p className="text-xl mt-4" style={{ color: styles.header.color, opacity: 0.8 }}>{section.subtitle}</p>
-    </section>
-);
-const ContentSection = ({ section, styles }) => (
-    <section className="bg-white p-6 rounded-lg shadow mt-8">
-        <h2 style={styles.h2} className="text-2xl font-bold pb-2 mb-4">{section.title}</h2>
-        <p className="text-gray-700 whitespace-pre-line">{section.content}</p>
-    </section>
-);
-const ServicesSection = ({ section, styles }) => (
-    <section className="mt-8 bg-white p-6 rounded-lg shadow">
-        <h2 style={styles.h2} className="text-2xl font-bold pb-2 mb-4">{section.title}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {section.items && section.items.length > 0 ? section.items.map((service, index) => (
-                <div key={index} style={styles.serviceCard} className="p-4 rounded-md">
-                    <h3 className="font-bold text-lg" style={{ color: styles.h2.color }}>{service.title}</h3>
-                    <p className="text-gray-600 mt-1">{service.description}</p>
-                </div>
-            )) : <p>No services listed.</p>}
+    <section className="relative text-white rounded-lg overflow-hidden">
+        <img src={section.imageUrl} alt="Hero background" className="absolute h-full w-full object-cover" />
+        <div className="absolute h-full w-full bg-black opacity-50"></div>
+        <div className="relative z-10 flex flex-col items-center justify-center p-12 md:p-24">
+            <h1 className="text-4xl md:text-6xl font-bold text-center" style={{ fontFamily: styles.global.headingFont }}>{section.heading}</h1>
+            <p className="text-lg md:text-xl mt-4 text-center" style={{ fontFamily: styles.global.bodyFont }}>{section.subheading}</p>
+            {/* FIX: Combined the two className attributes into one */}
+            <a 
+                href="#contact" 
+                className={`mt-8 px-8 py-3 font-bold text-lg transition-transform hover:scale-105 ${styles.global.buttonStyle}`}
+                style={{ backgroundColor: styles.global.secondaryColor, color: styles.global.textColor, fontFamily: styles.global.headingFont }}
+            >
+                {section.buttonText}
+            </a>
         </div>
     </section>
 );
-const ContactSection = ({ section, styles }) => (
-    <section className="mt-8 bg-white p-6 rounded-lg shadow">
-        <h2 style={styles.h2} className="text-2xl font-bold pb-2 mb-4">{section.title}</h2>
-        {section.phone && <p><strong>Phone:</strong> {section.phone}</p>}
-        {section.email && <p><strong>Email:</strong> {section.email}</p>}
-        {section.address && <p><strong>Address:</strong> {section.address}</p>}
+
+const FeaturesSection = ({ section, styles }) => (
+    <section className="py-16">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: styles.global.headingFont, color: styles.global.textColor }}>{section.title}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {section.items?.map((item, index) => (
+                <div key={index} className="text-center p-4">
+                    <h3 className="text-xl font-bold" style={{ fontFamily: styles.global.headingFont, color: styles.global.primaryColor }}>{item.title}</h3>
+                    <p className="mt-2 text-gray-600" style={{ fontFamily: styles.global.bodyFont, color: styles.global.textColor }}>{item.description}</p>
+                </div>
+            ))}
+        </div>
     </section>
 );
+
+const GallerySection = ({ section, styles }) => (
+    <section className="py-16 bg-gray-50 rounded-lg">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: styles.global.headingFont, color: styles.global.textColor }}>{section.title}</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {section.images?.map((image, index) => (
+                <img key={index} src={image.url} alt={image.alt} className="w-full h-full object-cover rounded-lg shadow-md hover:shadow-xl transition-shadow"/>
+            ))}
+        </div>
+    </section>
+);
+
+const TestimonialsSection = ({ section, styles }) => (
+     <section className="py-16">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: styles.global.headingFont, color: styles.global.textColor }}>{section.title}</h2>
+        <div className="space-y-8">
+            {section.items?.map((item, index) => (
+                <blockquote key={index} className="text-center max-w-2xl mx-auto">
+                    <p className="text-xl italic" style={{ fontFamily: styles.global.bodyFont, color: styles.global.textColor }}>"{item.quote}"</p>
+                    <cite className="block font-bold mt-4 not-italic" style={{ fontFamily: styles.global.headingFont, color: styles.global.primaryColor }}>- {item.author}</cite>
+                </blockquote>
+            ))}
+        </div>
+    </section>
+);
+
+const ContactSection = ({ section, styles }) => (
+     <section id="contact" className="py-16 bg-gray-800 text-white rounded-lg">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: styles.global.headingFont }}>{section.title}</h2>
+        <div className="text-center space-y-2" style={{ fontFamily: styles.global.bodyFont }}>
+            {section.phone && <p><strong>Phone:</strong> {section.phone}</p>}
+            {section.email && <p><strong>Email:</strong> <a href={`mailto:${section.email}`} className="underline">{section.email}</a></p>}
+            {section.address && <p><strong>Address:</strong> {section.address}</p>}
+        </div>
+    </section>
+);
+
 
 // --- Dynamic Page Renderer ---
 const sectionComponentMap = {
     hero: HeroSection,
-    about: ContentSection,
-    summary: ContentSection,
-    history: ContentSection,
-    services: ServicesSection,
-    serviceList: ServicesSection,
-    contact: ContactSection,
+    features: FeaturesSection,
+    gallery: GallerySection,
+    testimonials: TestimonialsSection,
     contactInfo: ContactSection,
 };
 
-// Helper to generate styles based on colors
-const getThemeStyles = (primaryColor, secondaryColor) => ({
-    header: { backgroundColor: primaryColor, color: 'white' },
-    hero: { backgroundColor: primaryColor },
-    h2: { color: primaryColor, borderBottom: `2px solid ${secondaryColor}` },
-    serviceCard: { backgroundColor: '#F9F9F9', borderLeft: `4px solid ${primaryColor}` }
-});
-
-
-// --- Main Page Component ---
 export default function HomePage() {
-    // State to manage the currently visible page
     const [activePageKey, setActivePageKey] = useState('home');
 
-    // Effect to handle URL hash changes for navigation
     useEffect(() => {
-        const handleHashChange = () => {
-            const hash = window.location.hash.replace('#', '');
-            // Default to 'home' if hash is empty or doesn't match a page
-            setActivePageKey(hash || 'home');
-        };
-
+        const handleHashChange = () => setActivePageKey(window.location.hash.replace('#', '') || 'home');
         window.addEventListener('hashchange', handleHashChange);
-        handleHashChange(); // Set initial page on load
-
+        handleHashChange();
         return () => window.removeEventListener('hashchange', handleHashChange);
     }, []);
 
-    // 1. Read and parse the website configuration
     const configRaw = process.env.NEXT_PUBLIC_WEBSITE_CONFIG || "{}";
     let config = {};
     try {
         config = JSON.parse(configRaw);
     } catch (e) {
-        console.error("Failed to parse website config:", e);
-        return <div className="text-center text-red-500 p-8">Error: Website configuration is invalid.</div>;
+        return <div>Error: Website configuration is invalid.</div>;
     }
 
-    // 2. Destructure properties with defaults
     const {
         companyName = "Company Name",
         logoUrl,
-        primaryColor = '#1E3A8A',
-        secondaryColor = '#FBBF24',
+        globalStyles = {},
         pages = {}
     } = config;
-
-    const styles = getThemeStyles(primaryColor, secondaryColor);
+    
+    const styles = { global: globalStyles };
     const pageKeys = Object.keys(pages);
-    const currentPage = pages[activePageKey] || pages.home; // Fallback to home page
+    const currentPage = pages[activePageKey] || pages.home;
 
-    if (!currentPage || !currentPage.sections) {
-        return <div className="text-center text-red-500 p-8">Error: Page content not found. Please configure in the admin panel.</div>;
-    }
+    if (!currentPage) return <div>Page not found.</div>;
 
     return (
-        <div className="font-sans max-w-4xl mx-auto p-4 md:p-8">
-            <header style={styles.header} className="p-6 rounded-lg shadow-md flex items-center justify-between">
-                {logoUrl ? (
-                    <img src={logoUrl} alt={`${companyName} Logo`} className="h-16" />
-                ) : (
-                    <h1 className="text-3xl font-bold">{companyName}</h1>
-                )}
-                {/* **NEW**: Navigation Menu */}
-                <nav className="flex space-x-6">
-                    {pageKeys.map(pageKey => (
-                        <a 
-                            key={pageKey} 
-                            href={`#${pageKey}`}
-                            onClick={() => setActivePageKey(pageKey)}
-                            className={`text-lg font-medium ${activePageKey === pageKey ? 'underline' : ''}`}
-                            style={{ color: styles.header.color }}
-                        >
-                            {pages[pageKey].title}
-                        </a>
-                    ))}
-                </nav>
-            </header>
+        <>
+            <GoogleFontLoader fontNames={[globalStyles.headingFont, globalStyles.bodyFont].filter(Boolean)} />
+            <div style={{ backgroundColor: globalStyles.backgroundColor, color: globalStyles.textColor, fontFamily: globalStyles.bodyFont }}>
+                <div className="max-w-6xl mx-auto p-4 md:p-8">
+                    <header className="p-4 flex items-center justify-between">
+                        {logoUrl ? <img src={logoUrl} alt={`${companyName} Logo`} className="h-12" /> : <h1 className="text-2xl font-bold" style={{ fontFamily: globalStyles.headingFont, color: globalStyles.primaryColor }}>{companyName}</h1>}
+                        <nav className="flex space-x-6">
+                            {pageKeys.map(pageKey => (
+                                <a key={pageKey} href={`#${pageKey}`} onClick={() => setActivePageKey(pageKey)} className={`text-lg font-medium transition ${activePageKey === pageKey ? 'underline' : 'hover:underline'}`} style={{ color: globalStyles.primaryColor, fontFamily: globalStyles.headingFont }}>
+                                    {pages[pageKey].title}
+                                </a>
+                            ))}
+                        </nav>
+                    </header>
 
-            <main>
-                {/* Render sections of the currently active page */}
-                {Object.entries(currentPage.sections).map(([key, sectionData]) => {
-                    const Component = sectionComponentMap[key];
-                    return Component ? <Component key={key} section={sectionData} styles={styles} /> : null;
-                })}
-            </main>
-        </div>
+                    <main className="mt-8 space-y-12">
+                        {Object.entries(currentPage.sections).map(([key, sectionData]) => {
+                            const Component = sectionComponentMap[key];
+                            return Component ? <Component key={key} section={sectionData} styles={styles} /> : null;
+                        })}
+                    </main>
+                </div>
+            </div>
+        </>
     );
 }
