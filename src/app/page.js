@@ -5,11 +5,18 @@ import { Roboto, Lato, Montserrat, Open_Sans } from 'next/font/google';
 import { FaHardHat, FaCheckCircle, FaTools, FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from 'react-icons/fa';
 
 // --- FONT & ICON MAPPING ---
+
+// CORRECTED: Declare each font loader at the top level of the module scope.
+const roboto = Roboto({ subsets: ['latin'], weight: ['400', '700'] });
+const lato = Lato({ subsets: ['latin'], weight: ['400', '700'] });
+const montserrat = Montserrat({ subsets: ['latin'], weight: ['400', '700'] });
+const openSans = Open_Sans({ subsets: ['latin'], weight: ['400', '700'] });
+
 const fontMap = {
-    Roboto: Roboto({ subsets: ['latin'], weight: ['400', '700'] }).style.fontFamily,
-    Lato: Lato({ subsets: ['latin'], weight: ['400', '700'] }).style.fontFamily,
-    Montserrat: Montserrat({ subsets: ['latin'], weight: ['400', '700'] }).style.fontFamily,
-    'Open Sans': Open_Sans({ subsets: ['latin'], weight: ['400', '700'] }).style.fontFamily,
+    Roboto: roboto.style.fontFamily,
+    Lato: lato.style.fontFamily,
+    Montserrat: montserrat.style.fontFamily,
+    'Open Sans': openSans.style.fontFamily,
 };
 const iconMap = {
     FaHardHat, FaCheckCircle, FaTools,
@@ -308,4 +315,3 @@ export default function HomePage() {
         </>
     );
 }
-
