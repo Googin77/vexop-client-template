@@ -27,6 +27,9 @@ const FooterStyle2 = ({ config, theme }) => {
                     </div>
                 </div>
             </div>
+            <div className="mt-8 pt-8 border-t border-gray-700 text-center text-xs text-gray-400">
+                {config.footer.settings.copyrightText.replace('[CompanyName]', config.branding.companyName)}
+            </div>
         </footer>
     );
 };
